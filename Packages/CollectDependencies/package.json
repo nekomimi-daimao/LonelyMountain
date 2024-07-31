@@ -1,0 +1,10 @@
+{
+  "name": "daimao.nekomimi.collectdependencies",
+  "displayName": "CollectDependencies",
+  "version": "1.0.0",
+  "description": "collect dependencies",
+  "license": "MIT",
+  "author": {
+    "name": "ねこみみだいまおう"
+  }
+}
