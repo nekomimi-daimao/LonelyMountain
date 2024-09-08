@@ -1,10 +1,9 @@
-using System;
 using System.Linq;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-// ReSharper disable once CheckNamespace
 using UnityEditor;
 
+// ReSharper disable once CheckNamespace
 namespace Nekomimi.Daimao.OpenAllPrefab.Editor
 {
     public static class OpenAllPrefab
@@ -14,31 +13,45 @@ namespace Nekomimi.Daimao.OpenAllPrefab.Editor
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            var prefabs = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets" })
+            var prefabs = AssetDatabase.FindAssets("t:Prefab", new[] { "Assets/" })
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .ToArray();
             var prefabsLength = prefabs.Length;
 
+            Debug.Log(prefabsLength);
 
-            for (var index = 0; index < prefabsLength; index++)
+            try
             {
-                var p = prefabs[index];
-
-                var canceled = EditorUtility.DisplayCancelableProgressBar(
-                    p,
-                    $"{index}/{prefabsLength}",
-                    (float)index / prefabsLength
-                );
-                if (canceled)
+                for (var index = 0; index < prefabsLength; index++)
                 {
-                    Debug.LogWarning($"{nameof(OpenAllPrefab)} canceled");
-                    return;
-                }
+                    var p = prefabs[index];
 
-                var loadPrefabContents = PrefabUtility.LoadPrefabContents(p);
-                PrefabUtility.SaveAsPrefabAsset(loadPrefabContents, p);
-                PrefabUtility.UnloadPrefabContents(loadPrefabContents);
+                    Debug.Log($"{p}");
+
+                    var canceled = EditorUtility.DisplayCancelableProgressBar(
+                        p,
+                        $"{index}/{prefabsLength}",
+                        (float)index / prefabsLength
+                    );
+                    if (canceled)
+                    {
+                        Debug.LogWarning($"{nameof(OpenAllPrefab)} canceled");
+                        return;
+                    }
+
+                    var loadPrefabContents = PrefabUtility.LoadPrefabContents(p);
+                    PrefabUtility.SaveAsPrefabAsset(loadPrefabContents, p);
+                    PrefabUtility.UnloadPrefabContents(loadPrefabContents);
+                }
             }
+            finally
+            {
+                EditorUtility.ClearProgressBar();
+            }
+
+            AssetDatabase.SaveAssets();
+
+            Debug.Log($"{nameof(OpenAllPrefab)} succeeded");
 
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
